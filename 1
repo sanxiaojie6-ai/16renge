@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>职场16人格测试</title>
+<style>
+body{font-family:Arial;background:#fff;color:#000;padding:20px;max-width:800px;margin:auto}
+.question{margin-bottom:26px}
+.option{display:block;margin:8px 0;padding:12px;border-radius:8px;cursor:pointer;background:#f2f2f2}
+.option.selected{background:#666;color:#fff}
+button{padding:12px 20px;border:none;background:#333;color:#fff;border-radius:8px;cursor:pointer}
+.result{margin-top:30px;padding:20px;border:1px solid #ddd;border-radius:10px;line-height:1.7}
+.result img{width:100%;height:240px;object-fit:cover;border-radius:12px;margin-bottom:16px}
+.tag{display:inline-block;background:#eee;padding:4px 8px;border-radius:6px;margin-right:6px;margin-top:6px}
+.title{font-size:22px;font-weight:bold;margin-bottom:6px}
+.sub{color:#666;margin-bottom:10px}
+</style>
+</head>
+<body>
+<h1>职场16人格测试</h1>
+<div id="quiz"></div>
+<button id="submitBtn" onclick="calculate()">提交测试</button>
+<div id="result" class="result"></div>
+
+<script>
+// 🔥 30道剧情升级版高代入题（完整版）
+const questions = [
+{
+q:"你刚点开外卖，筷子都掰开了，第一口还没送进嘴里，群里突然弹出：@你，老板：这个需求我现在就要。",
+options:[
+{text:"一边吃一边干，嘴里嚼着手里敲着",score:{exec:2}},
+{text:"先回‘收到’，再慢慢处理",score:{expr:2}},
+{text:"先问清做到什么程度",score:{up:2}},
+{text:"先看看有没有人接这个活",score:{strat:2}}
+]
+},
+{
+q:"周五晚上，你已经关电脑准备走人，领导突然说：大家留下来开个短会，很快结束。",
+options:[
+{text:"直接留下来干就完了",score:{exec:2}},
+{text:"先问会议内容再决定",score:{up:2}},
+{text:"边开会边表达推进",score:{expr:2}},
+{text:"观察大家反应再行动",score:{strat:2}}
+]
+},
+{
+q:"你精心准备一天的PPT，老板听了10秒说：直接讲重点。",
+options:[
+{text:"立刻进入精华版",score:{expr:2}},
+{text:"按原逻辑继续讲",score:{exec:2}},
+{text:"边讲边调整内容",score:{up:2}},
+{text:"有点慌开始念稿",score:{strat:2}}
+]
+},
+{
+q:"例会上领导突然放了个响屁，旁边同事马上说是你，全场看向你。",
+options:[
+{text:"逻辑解释现场情况",score:{expr:2}},
+{text:"笑着化解气氛",score:{expr:1,strat:1}},
+{text:"反手把锅丢回去",score:{strat:2}},
+{text:"沉默隐身",score:{strat:2}}
+]
+},
+{
+q:"同事把锅推给你，领导正在等解释。",
+options:[
+{text:"直接解决问题",score:{exec:2}},
+{text:"清晰表达事实",score:{expr:2}},
+{text:"引导领导判断",score:{up:2}},
+{text:"先看局势再说",score:{strat:2}}
+]
+},
+// 下面继续高密度场景
+...Array.from({length:25}).map((_,i)=>({
+q:[
+"你做的项目被别人拿去汇报",
+"会议开了2小时没有结论",
+"客户半夜突然改需求",
+"你连续加班第三天",
+"群里突然cue你发言",
+"同事疯狂内卷",
+"老板情绪很差",
+"方案被当场否掉",
+"上线前临时大改",
+"团队开始互相甩锅",
+"你被拉进陌生项目群",
+"领导让你带新人",
+"你项目出问题",
+"临时让你汇报",
+"功劳被抢",
+"跨部门沟通卡住",
+"老板突然查进度",
+"连续熬夜赶工",
+"客户无理要求",
+"团队氛围压抑",
+"别人摸鱼你干活",
+"优化流程任务",
+"准备竞聘晋升",
+"重要汇报前夜",
+"团队组织架构调整"
+][i],
+options:[
+{text:"直接推进结果",score:{exec:2}},
+{text:"先表达清楚",score:{expr:2}},
+{text:"先看上级意图",score:{up:2}},
+{text:"先观察再行动",score:{strat:2}}
+]
+}))
+];
+
+let answers = [];
+let locked = false;
+
+function render(){
+const quiz = document.getElementById('quiz');
+quiz.innerHTML='';
+questions.forEach((q,i)=>{
+let div=document.createElement('div');
+div.className='question';
+div.innerHTML=`<p>${i+1}. ${q.q}</p>`;
+q.options.forEach((opt)=>{
+let btn=document.createElement('div');
+btn.className='option';
+btn.innerText=opt.text;
+btn.onclick=()=>{
+if(locked) return;
+answers[i]=opt.score;
+let siblings = div.querySelectorAll('.option');
+siblings.forEach(s=>s.classList.remove('selected'));
+btn.classList.add('selected');
+};
+div.appendChild(btn);
+});
+quiz.appendChild(div);
+});
+}
+
+function calculate(){
+if(answers.length < questions.length || answers.includes(undefined)){
+alert("还有题没有做出选择哦！30道题可比你的KPI容易多了吧～");
+return;
+}
+
+locked = true;
+document.getElementById('submitBtn').disabled = true;
+
+let total={exec:0,expr:0,up:0,strat:0};
+answers.forEach(a=>{for(let k in a){total[k]+=a[k];}});
+
+// 🔥 16人格（完整）
+const personalities=[
+{name:"汇报大师",main:"expr",sub:"up",img:"images/huibao.jpg",desc:"你开口就是重点，三句话讲清一个项目，是老板最爱听的人。",tags:["表达王","懂汇报"]},
+{name:"会议狂人",main:"up",sub:"expr",img:"images/meeting.jpg",desc:"一天开三场会，你比谁都忙，但产出主要在会议纪要里。",tags:["开会","协调"]},
+{name:"苦命马喽",main:"exec",sub:"strat",img:"images/malou.jpg",desc:"活都是你干，功劳别人拿，你是职场最稳定的工具人。",tags:["执行","抗压"]},
+{name:"甩锅艺术家",main:"strat",sub:"expr",img:"images/throw.jpg",desc:"功劳可以共享，责任必须单飞，你从不背锅。",tags:["甩锅","自保"]},
+{name:"向上管理王",main:"up",sub:"strat",img:"images/up.jpg",desc:"你比老板更懂老板，提前规避一切风险。",tags:["向上","预判"]},
+{name:"演员型打工人",main:"expr",sub:"strat",img:"images/actor.jpg",desc:"状态不一定在线，但表演必须在线。",tags:["演技","职场感"]},
+{name:"执行机器",main:"exec",sub:"exec",img:"images/exec.jpg",desc:"你只认结果，干就完了，是最纯粹的执行派。",tags:["效率","行动"]},
+{name:"摸鱼哲学家",main:"strat",sub:"up",img:"images/fish.jpg",desc:"你研究的是如何优雅地不干活。",tags:["摸鱼","生存"]},
+{name:"老黄牛",main:"exec",sub:"exec",img:"images/cow.jpg",desc:"踏实干活，从不抱怨，但也容易被忽视。",tags:["踏实","稳定"]},
+{name:"流量型选手",main:"expr",sub:"exec",img:"images/traffic.jpg",desc:"你做的东西不一定多，但一定被看到。",tags:["曝光","表达"]},
+{name:"透明人",main:"strat",sub:"exec",img:"images/ghost.jpg",desc:"你一直都在，但没人注意到你。",tags:["隐身","低存在"]},
+{name:"资源整合者",main:"up",sub:"expr",img:"images/resource.jpg",desc:"你不干活，但能让事情发生。",tags:["连接","资源"]},
+{name:"节奏掌控者",main:"strat",sub:"up",img:"images/control.jpg",desc:"你掌控节奏，让别人跟着你走。",tags:["节奏","掌控"]},
+{name:"气氛组",main:"expr",sub:"people",img:"images/party.jpg",desc:"人在工位，气氛到位。",tags:["氛围","社交"]},
+{name:"低调搞钱王",main:"exec",sub:"strat",img:"images/money.jpg",desc:"不声不响，但钱是真的到账。",tags:["结果","赚钱"]},
+{name:"全局操盘手",main:"up",sub:"strat",img:"images/boss.jpg",desc:"你不下场，但局一直在你手里。",tags:["操盘","格局"]}
+];
+
+let best=null,max=0;
+personalities.forEach(p=>{
+let score= total[p.main]*0.6 + total[p.sub]*0.4;
+if(score>max){max=score;best=p;}
+});
+
+let percent = Math.min(100,Math.round(max));
+
+document.getElementById('result').innerHTML=`
+<img src="${best.img}" />
+<div class="title">你的职场人格：${best.name}</div>
+<div class="sub">匹配度 ${percent}%</div>
+<p>${best.desc}</p>
+<div>${best.tags.map(t=>`<span class='tag'>${t}</span>`).join('')}</div>
+<hr>
+<p>👉 转发给朋友看看他们是哪一类。</p>
+`;
+}
+
+render();
+</script>
+</body>
+</html>
