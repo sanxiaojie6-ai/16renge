@@ -1,193 +1,879 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>职场16人格测试</title>
-<style>
-body{font-family:Arial;background:#fff;color:#000;padding:20px;max-width:800px;margin:auto}
-.question{margin-bottom:26px}
-.option{display:block;margin:8px 0;padding:12px;border-radius:8px;cursor:pointer;background:#f2f2f2}
-.option.selected{background:#666;color:#fff}
-button{padding:12px 20px;border:none;background:#333;color:#fff;border-radius:8px;cursor:pointer}
-.result{margin-top:30px;padding:20px;border:1px solid #ddd;border-radius:10px;line-height:1.7}
-.result img{width:100%;height:240px;object-fit:cover;border-radius:12px;margin-bottom:16px}
-.tag{display:inline-block;background:#eee;padding:4px 8px;border-radius:6px;margin-right:6px;margin-top:6px}
-.title{font-size:22px;font-weight:bold;margin-bottom:6px}
-.sub{color:#666;margin-bottom:10px}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>职场16人格测试（可操控版）</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        body {
+            background-color: #f5f7fa;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .container {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        .test-container {
+            display: none; /* 初始隐藏测试题，默认显示引导页 */
+        }
+        .question {
+            margin-bottom: 25px;
+            padding: 20px;
+            background-color: #fafafa;
+            border-radius: 8px;
+            border-left: 4px solid #4299e1;
+        }
+        .question h3 {
+            color: #2d3748;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .option {
+            padding: 12px 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .option:hover {
+            background-color: #e8f4f8;
+            border-color: #4299e1;
+        }
+        .option.selected {
+            background-color: #e8f4f8;
+            border-color: #4299e1;
+            color: #4299e1;
+            font-weight: 600;
+        }
+        .btn-group {
+            text-align: center;
+            margin-top: 40px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-start {
+            background-color: #4299e1;
+            color: #fff;
+        }
+        .btn-submit {
+            background-color: #48bb78;
+            color: #fff;
+        }
+        .btn-reset {
+            background-color: #ed8936;
+            color: #fff;
+        }
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        .result-container {
+            display: none; /* 初始隐藏结果页 */
+            text-align: center;
+            padding: 40px 20px;
+        }
+        .result-img {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 30px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 5px solid #f0f0f0;
+        }
+        .result-title {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        .result-desc {
+            font-size: 16px;
+            color: #4a5568;
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 0 auto 30px;
+            text-align: left;
+            padding: 0 20px;
+        }
+        .result-desc p {
+            margin-bottom: 10px;
+        }
+        .result-desc .fear {
+            color: #e53e3e;
+            font-weight: 600;
+            margin-top: 15px;
+        }
+        .guide-container {
+            text-align: center;
+            padding: 50px 20px;
+        }
+        .guide-container p {
+            font-size: 18px;
+            color: #4a5568;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+        .score-hint {
+            font-size: 14px;
+            color: #718096;
+            margin-top: 10px;
+            text-align: center;
+        }
+        /* 适配移动端 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 15px;
+            }
+            h1 {
+                font-size: 24px;
+            }
+            .question h3 {
+                font-size: 16px;
+            }
+            .btn {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+            .result-img {
+                width: 150px;
+                height: 150px;
+            }
+            .result-title {
+                font-size: 22px;
+            }
+            .result-desc {
+                font-size: 15px;
+                padding: 0 10px;
+            }
+        }
+    </style>
 </head>
 <body>
-<h1>职场16人格测试</h1>
-<div id="quiz"></div>
-<button id="submitBtn" onclick="calculate()">提交测试</button>
-<div id="result" class="result"></div>
+    <div class="container">
+        <h1>职场16人格测试</h1>
+        
+        <!-- 引导页 -->
+        <div class="guide-container" id="guideContainer">
+            <p>30道职场场景题，精准匹配你的职场人格</p>
+            <p>请根据自身真实反应选择选项，不要过度思考，测试结果更精准哦～</p>
+            <button class="btn btn-start" id="startBtn">开始测试</button&gt;
+        &lt;/div&gt;
 
-<script>
-// 🔥 30道剧情升级版高代入题（完整版）
-const questions = [
-{
-q:"你刚点开外卖，筷子都掰开了，第一口还没送进嘴里，群里突然弹出：@你，老板：这个需求我现在就要。",
-options:[
-{text:"一边吃一边干，嘴里嚼着手里敲着",score:{exec:2}},
-{text:"先回‘收到’，再慢慢处理",score:{expr:2}},
-{text:"先问清做到什么程度",score:{up:2}},
-{text:"先看看有没有人接这个活",score:{strat:2}}
-]
-},
-{
-q:"周五晚上，你已经关电脑准备走人，领导突然说：大家留下来开个短会，很快结束。",
-options:[
-{text:"直接留下来干就完了",score:{exec:2}},
-{text:"先问会议内容再决定",score:{up:2}},
-{text:"边开会边表达推进",score:{expr:2}},
-{text:"观察大家反应再行动",score:{strat:2}}
-]
-},
-{
-q:"你精心准备一天的PPT，老板听了10秒说：直接讲重点。",
-options:[
-{text:"立刻进入精华版",score:{expr:2}},
-{text:"按原逻辑继续讲",score:{exec:2}},
-{text:"边讲边调整内容",score:{up:2}},
-{text:"有点慌开始念稿",score:{strat:2}}
-]
-},
-{
-q:"例会上领导突然放了个响屁，旁边同事马上说是你，全场看向你。",
-options:[
-{text:"逻辑解释现场情况",score:{expr:2}},
-{text:"笑着化解气氛",score:{expr:1,strat:1}},
-{text:"反手把锅丢回去",score:{strat:2}},
-{text:"沉默隐身",score:{strat:2}}
-]
-},
-{
-q:"同事把锅推给你，领导正在等解释。",
-options:[
-{text:"直接解决问题",score:{exec:2}},
-{text:"清晰表达事实",score:{expr:2}},
-{text:"引导领导判断",score:{up:2}},
-{text:"先看局势再说",score:{strat:2}}
-]
-},
-// 下面继续高密度场景
-...Array.from({length:25}).map((_,i)=>({
-q:[
-"你做的项目被别人拿去汇报",
-"会议开了2小时没有结论",
-"客户半夜突然改需求",
-"你连续加班第三天",
-"群里突然cue你发言",
-"同事疯狂内卷",
-"老板情绪很差",
-"方案被当场否掉",
-"上线前临时大改",
-"团队开始互相甩锅",
-"你被拉进陌生项目群",
-"领导让你带新人",
-"你项目出问题",
-"临时让你汇报",
-"功劳被抢",
-"跨部门沟通卡住",
-"老板突然查进度",
-"连续熬夜赶工",
-"客户无理要求",
-"团队氛围压抑",
-"别人摸鱼你干活",
-"优化流程任务",
-"准备竞聘晋升",
-"重要汇报前夜",
-"团队组织架构调整"
-][i],
-options:[
-{text:"直接推进结果",score:{exec:2}},
-{text:"先表达清楚",score:{expr:2}},
-{text:"先看上级意图",score:{up:2}},
-{text:"先观察再行动",score:{strat:2}}
-]
-}))
-];
+        <!-- 测试题容器 -->
+        <div class="test-container" id="testContainer"&gt;
+            <!-- 测试题将通过JS动态渲染 -->
+            <div class="btn-group">
+                <button class="btn btn-reset" id="resetBtn">重新测试</button>
+                <button class="btn btn-submit" id="submitBtn">提交测试</button>
+            </div>
+            <p class="score-hint">已完成：<span id="finishedCount">0</span>/30 题</p>
+        </div><!-- 结果页容器 -->
+        <div class="result-container" id="resultContainer">
+            <img src="" alt="职场人格图片" class="result-img" id="personalityImg">
+            <h2 class="result-title" id="personalityTitle"></h2>
+            <div class="result-desc" id="personalityDesc"></div>
+            <div class="btn-group">
+                <button class="btn btn-reset" id="restartBtn">重新测试</button>
+            </div>
+        </div>
+    </div>
 
-let answers = [];
-let locked = false;
+    <script>
+        // 1. 评分维度初始化（7项，初始得分为0）
+        const scores = {
+            执行: 0,
+            表达: 0,
+            向上: 0,
+            人际: 0,
+            责任: 0,
+            策略: 0,
+            投入: 0
+        };
 
-function render(){
-const quiz = document.getElementById('quiz');
-quiz.innerHTML='';
-questions.forEach((q,i)=>{
-let div=document.createElement('div');
-div.className='question';
-div.innerHTML=`<p>${i+1}. ${q.q}</p>`;
-q.options.forEach((opt)=>{
-let btn=document.createElement('div');
-btn.className='option';
-btn.innerText=opt.text;
-btn.onclick=()=>{
-if(locked) return;
-answers[i]=opt.score;
-let siblings = div.querySelectorAll('.option');
-siblings.forEach(s=>s.classList.remove('selected'));
-btn.classList.add('selected');
-};
-div.appendChild(btn);
-});
-quiz.appendChild(div);
-});
-}
+        // 2. 30道测试题（与原方案完全一致，含选项分值）
+        const questions = [
+            {
+                title: "你精心准备了一整天的PPT汇报，甚至连标点符号都核对了一遍，结果老板只听了10秒就说：“你直接讲重点。”你当场心里一紧，脑子空白一秒，然后你会：",
+                options: [
+                    { text: "迅速观察老板表情，边讲边改", scores: { 向上: 1, 策略: 1 } },
+                    { text: "立刻切重点，语速加快进入“精华版”", scores: { 表达: 1, 向上: 1 } },
+                    { text: "心里骂一句但继续按原逻辑讲", scores: { 执行: 2 } },
+                    { text: "有点慌，开始照着PPT念", scores: { 表达: -2 } }
+                ]
+            },
+            {
+                title: "你刚点开外卖准备好好吃一口，筷子都已经夹起来了，群里突然弹出：@你，老板说这个需求“现在就要”。你一边饿到发抖一边点开文档：",
+                options: [
+                    { text: "先问清到底要到什么程度", scores: { 向上: 2 } },
+                    { text: "先看看有没有别人接这个活", scores: { 策略: 2 } },
+                    { text: "边吃边干，手速拉满", scores: { 执行: 1, 投入: 1 } },
+                    { text: "先回“收到”，再慢慢处理", scores: { 表达: 1, 策略: 1 } }
+                ]
+            },
+            {
+                title: "crush终于答应跟你共进晚餐，你连穿搭和话题都想好了，结果刚准备下班，领导在群里说：今晚大家一起开个会对齐一下。你盯着手机沉默了两秒：",
+                options: [
+                    { text: "私聊领导争取时间", scores: { 向上: 2 } },
+                    { text: "假装没看到，先去约会", scores: { 策略: 2 } },
+                    { text: "先把约会往后推", scores: { 执行: 1, 策略: 1 } },
+                    { text: "秒回“收到”，默默取消约会", scores: { 投入: 2 } }
+                ]
+            },
+            {
+                title: "领导当众放了一个很响的屁，空气突然安静，旁边一个心机同事马上皱眉说：“是不是你？”所有人都看向你，你瞬间社死：",
+                options: [
+                    { text: "尴尬笑笑试图糊过去", scores: { 策略: 2 } },
+                    { text: "立刻否认并解释", scores: { 表达: 1, 人际: -1 } },
+                    { text: "反问一句把锅丢回去", scores: { 策略: 1, 人际: 1 } },
+                    { text: "直接沉默当没发生", scores: { 人际: -2 } }
+                ]
+            },
+            {
+                title: "项目已经改到第7版，你眼睛发干、脑子发胀，老板轻飘飘来一句：“再微调一下就好。”你盯着屏幕停顿了一秒：",
+                options: [
+                    { text: "先放一放晚点再动", scores: { 策略: 2 } },
+                    { text: "问清“微调”到底是啥", scores: { 向上: 2 } },
+                    { text: "提出修改边界", scores: { 表达: 2 } },
+                    { text: "深呼吸继续改", scores: { 投入: 2 } }
+                ]
+            },
+            {
+                title: "你连续加班3天，改了无数版方案，第二天老板在群里只说了一句“大家辛苦了”，甚至没单独提你：",
+                options: [
+                    { text: "心里记一笔开始调整投入", scores: { 策略: 2 } },
+                    { text: "下次汇报重点强调自己工作量", scores: { 表达: 2 } },
+                    { text: "表面无所谓但开始摆烂", scores: { 责任: -2 } },
+                    { text: "私下找领导同步自己的付出", scores: { 向上: 2 } }
+                ]
+            },
+            {
+                title: "你发现一个明显很蠢、效率极低的流程，但整个团队都在按这个执行，没有人提出问题：",
+                options: [
+                    { text: "先观察有没有人会说", scores: { 策略: 2 } },
+                    { text: "私下绕开这个流程", scores: { 策略: 2 } },
+                    { text: "直接提优化建议", scores: { 表达: 2 } },
+                    { text: "拉着同事一起讨论，再找领导提建议", scores: { 人际: 1, 向上: 1 } }
+                ]
+            },
+            {
+                title: "同事把一个明显没做完的工作直接甩给你，还在有领导的群里@了你说“你帮忙补一下”，你一瞬间血压上来了：",
+                options: [
+                    { text: "先不说话看领导态度", scores: { 策略: 1, 执行: -1 } },
+                    { text: "条理清晰说明分工", scores: { 表达: 2 } },
+                    { text: "把任务重新拆清", scores: { 策略: 1, 责任: 1 } },
+                    { text: "私下找同事沟通，避免后续甩锅", scores: { 人际: 1, 策略: 1 } }
+                ]
+            },
+            {
+                title: "周五晚上，你已经躺在床上准备放空，灯都关了，群里突然跳出一句：“大家看一下这个方案有没有问题”：",
+                options: [
+                    { text: "回一句“明天看”", scores: { 策略: 2 } },
+                    { text: "先问是否紧急", scores: { 向上: 1, 策略: 1 } },
+                    { text: "已读不回", scores: { 投入: -2 } },
+                    { text: "立刻爬起来看，同步领导进度", scores: { 投入: 1, 向上: 1 } }
+                ]
+            },
+            {
+                title: "你做完一个项目，从头到尾参与，但老板在会上只表扬了别人，你坐在下面一边点头一边有点复杂：",
+                options: [
+                    { text: "研究老板偏好", scores: { 向上: 2 } },
+                    { text: "表面平静慢慢放下期待", scores: { 责任: -2 } },
+                    { text: "下次主动汇报", scores: { 表达: 2 } },
+                    { text: "找同事打听老板喜好，投其所好", scores: { 人际: 1, 向上: 1 } }
+                ]
+            },
+            {
+                title: "部门群沉默了两天没人接话，第三天老板突然点名：这个项目你来接一下。你刚好在线：",
+                options: [
+                    { text: "先问资源和支持", scores: { 策略: 2 } },
+                    { text: "提条件再接", scores: { 向上: 2 } },
+                    { text: "想办法分出去", scores: { 责任: -2 } },
+                    { text: "拉同事组队接手，合理分工", scores: { 人际: 1, 策略: 1 } }
+                ]
+            },
+            {
+                title: "会议已经开了两个小时，从A讲到Z，又从Z讲回A，最后大家开始讨论“要不要再开个会”：",
+                options: [
+                    { text: "全程不发言", scores: { 人际: -2 } },
+                    { text: "一边开会一边做别的", scores: { 投入: -2 } },
+                    { text: "主动总结推动结束", scores: { 表达: 2 } },
+                    { text: "带动同事发言，活跃会议氛围", scores: { 人际: 2 } }
+                ]
+            },
+            {
+                title: "部门团建聚餐，你刚夹起一块最爱的红烧肉，老板突然举杯看向你：“来，你说两句祝酒词，活跃下气氛！”你嘴里还塞着肉，瞬间僵住：",
+                options: [
+                    { text: "假装呛到，示意同事帮忙救场", scores: { 策略: 2 } },
+                    { text: "顺势夸老板和团队，巧妙转移焦点", scores: { 策略: 1, 人际: 1 } },
+                    { text: "简单说两句祝福，快速收尾不拖沓", scores: { 执行: 2 } },
+                    { text: "赶紧咽下去，硬着头皮临场发挥", scores: { 投入: 2 } }
+                ]
+            },
+            {
+                title: "领导突然在群里@你：现在进度怎么样了？你没有提前准备：",
+                options: [
+                    { text: "模糊带过", scores: { 策略: 2 } },
+                    { text: "强调难点和风险", scores: { 向上: 2 } },
+                    { text: "梳理逻辑再表达", scores: { 表达: 2 } },
+                    { text: "拉同事补充，一起汇报进度", scores: { 人际: 1, 责任: -1 } }
+                ]
+            },
+            {
+                title: "团建KTV局，老板喝嗨了，突然点了一首高音歌，指着你说：“来，陪我合唱，唱不好罚酒！”你五音不全，看着屏幕上的高音符号直冒汗：",
+                options: [
+                    { text: "借口去洗手间，等老板唱完再回来", scores: { 策略: 2 } },
+                    { text: "坦诚自己五音不全，用幽默化解尴尬", scores: { 表达: 2 } },
+                    { text: "默默站在旁边伴唱，不抢风头也不冷场", scores: { 人际: -2 } },
+                    { text: "硬着头皮上场，全程扯着嗓子跟唱，带动气氛", scores: { 人际: 2 } }
+                ]
+            },
+            {
+                title: "同一个项目里，你的任务量明显比别人多一倍，甚至开始影响节奏：",
+                options: [
+                    { text: "硬着头皮接下，加班也要完成，让领导看到你的努力", scores: { 投入: 2 } },
+                    { text: "提出不合理", scores: { 表达: 2 } },
+                    { text: "只做自己那部分", scores: { 责任: 2 } },
+                    { text: "找领导说明情况，协调同事分担", scores: { 向上: 1, 策略: 1, 人际: -1 } }
+                ]
+            },
+            {
+                title: "饭局上，老板被客户缠上，频频向你使眼色暗示你帮忙挡酒，你刚举起酒杯，客户甩来一个轻蔑的眼神：“我敬的是你们公司老板，你是老板吗？”你举起酒杯的手顿了顿：",
+                options: [
+                    { text: "笑着说“你敬的是老板，我敬的也是老板”", scores: { 表达: 2 } },
+                    { text: "放下酒杯，假装没看懂老板暗示", scores: { 向上: -2, 人际: -1 } },
+                    { text: "怼回去“都是朋友，敬酒不分高低，我陪您喝一杯”", scores: { 表达: 1, 人际: 1 } },
+                    { text: "立马对着老板拱手抱拳：“请老板传位于我！”", scores: { 向上: -1, 人际: 2 } }
+                ]
+            },
+            {
+                title: "你要给跨部门做重要汇报，对方负责人态度傲慢，全程低头玩手机，还时不时打断你说“听不懂”“没必要”，旁边的同事也都沉默不语，你看着尴尬的场面，会：",
+                options: [
+                    { text: "暂停汇报，笑着问对方“您更关注哪块内容，我重点讲”", scores: { 表达: 1, 人际: 1 } },
+                    { text: "忽略对方态度，继续按原逻辑汇报", scores: { 执行: 2 } },
+                    { text: "拉旁边沉默的同事帮忙补充，缓解尴尬", scores: { 人际: 2 } },
+                    { text: "私下找对方负责人单独沟通，争取支持", scores: { 向上: 2 } }
+                ]
+            },
+            {
+                title: "项目截止时间突然被提前一半，原本的分工和节奏全被打乱，还没人能帮忙，你看着堆积的任务急得上火：",
+                options: [
+                    { text: "筛选核心任务优先完成，非必要环节暂时搁置，避免全盘崩盘", scores: { 策略: 2 } },
+                    { text: "私聊领导说明现有困难，申请删减非核心任务或延长1天期限", scores: { 向上: 2 } },
+                    { text: "每完成一个小节点就发群里同步，让领导看到进度", scores: { 表达: 1, 向上: 1 } },
+                    { text: "拉同事帮忙，分工完成攻坚", scores: { 人际: 1, 执行: 1 } }
+                ]
+            },
+            {
+                title: "多人协作项目乱成一锅粥，有人漏做任务，有人重复干活，群里消息刷爆却没人对齐，你看着屏幕气到想摔鼠标：",
+                options: [
+                    { text: "先潜水看别人怎么动，不做第一个出头的", scores: { 策略: 2 } },
+                    { text: "明确每个人的责任，避免再甩锅", scores: { 责任: 2 } },
+                    { text: "发起临时会议，把混乱逻辑讲清楚", scores: { 表达: 2 } },
+                    { text: "拉着同事逐个对接，梳理任务分工", scores: { 人际: 2 } }
+                ]
+            },
+            {
+                title: "部门聚餐吃到一半，老板突然cue你：“听说你会P图，现在把咱们这桌合照修一下，发群里炫耀下！”你手机里没装修图软件，还被所有人盯着：",
+                options: [
+                    { text: "笑着说“修图需要精修，回头给大家出高清版”", scores: { 策略: 2 } },
+                    { text: "假装手机没电，找借口推脱", scores: { 投入: -2 } },
+                    { text: "用手机自带功能简单调整，先应付过去", scores: { 投入: 2 } },
+                    { text: "找会修图的同事帮忙，一起完成", scores: { 人际: 2 } }
+                ]
+            },
+            {
+                title: "会议上你被老板当众点名批评，说你“做事不细心”，全场安静得能听到呼吸声，你脸瞬间涨红：",
+                options: [
+                    { text: "低头点头不说话，熬到会议结束", scores: { 表达: -2 } },
+                    { text: "先认下问题，不找借口", scores: { 责任: 2 } },
+                    { text: "冷静解释前因后果，不卑不亢", scores: { 表达: 2 } },
+                    { text: "主动找领导私下道歉，说明问题原因", scores: { 向上: 2 } }
+                ]
+            },
+            {
+                title: "同组同事做了个爆款项目，全公司群转发表扬，老板还单独发了红包，你刷着消息心里有点酸：",
+                options: [
+                    { text: "分析他做成的关键，找自己的差距", scores: { 策略: 2 } },
+                    { text: "刷完就划走，跟自己没关系", scores: { 责任: -2 } },
+                    { text: "第一时间点赞评论，真诚送上祝福，私下请教经验", scores: { 人际: 2 } },
+                    { text: "找同事要方案，逐字拆解学习", scores: { 执行: 2 } }
+                ]
+            },
+            {
+                title: "老板突然私聊你，让你帮忙买一款限量款咖啡，只给了你一半的钱，还催着说“半小时内必须送到，我要招待客户”，你看着手机里的金额，又看了看时间：",
+                options: [
+                    { text: "先找咖啡店确认是否有货，再跟老板同步情况，避免白跑", scores: { 策略: 2 } },
+                    { text: "跟老板说明金额不足，问清是否需要自己垫钱，再去购买", scores: { 表达: 2 } },
+                    { text: "找同事帮忙代买，自己负责转账补差价，节省时间", scores: { 策略: 1, 人际: 1 } },
+                    { text: "自己垫钱，立刻跑腿去买，确保按时送到", scores: { 执行: 2, 策略: -1 } }
+                ]
+            },
+            {
+                title: "你刚下班走到地铁站，同事突然发消息：“帮我去公司楼下花店买一束鲜花，送到我家，钱回头给你”，你看着即将进站的地铁，又看了看花店距离：",
+                options: [
+                    { text: "先问清同事对鲜花的品种、数量要求，再去购买，避免买错", scores: { 策略: 2 } },
+                    { text: "拒绝同事，说自己有急事，无法帮忙", scores: { 人际: -2 } },
+                    { text: "跟同事说明自己已到地铁站，协商能否明天再买，或找花店配送", scores: { 表达: 2 } },
+                    { text: "找同事帮忙代买，自己跟进配送进度", scores: { 策略: 1, 人际: 1 } }
+                ]
+            },
+            {
+                title: "老板突然在群里@所有人，让大家每人准备一份“创意提点”，半小时后发群里，还要评选最优，选中的人加班陪他整理资料，你瞬间懵了：",
+                options: [
+                    { text: "随便写一条应付，不追求最优，避免被选中加班", scores: { 责任: -2 } },
+                    { text: "先看同事发的提点，再结合自己的想法修改，避免和别人重复", scores: { 策略: 1, 投入: 1 } },
+                    { text: "结合公司业务和老板喜好，写一条有特色的提点，清晰说明创意点", scores: { 表达: 2 } },
+                    { text: "拉同事一起 brainstorm，汇总优质提点", scores: { 人际: 2 } }
+                ]
+            },
+            {
+                title: "团建吃饭时，同事不小心把汤洒在了老板的西装上，所有人都愣住了，同事急得手足无措，老板脸色也不好看：",
+                options: [
+                    { text: "假装没看见，低头继续吃饭，避免卷入", scores: { 人际: -2 } },
+                    { text: "明确是同事不小心，不替人背锅也不煽风", scores: { 责任: 2 } },
+                    { text: "打圆场说“沾了汤更有烟火气”，缓解尴尬", scores: { 表达: 2 } },
+                    { text: "立刻找纸巾帮忙擦拭，主动提议送干洗，安抚同事和老板", scores: { 人际: 1, 向上: 1 } }
+                ]
+            },
+            {
+                title: "老板同时交给你三件事：买咖啡、打印文件、对接客户，三件事都要求10分钟内完成，咖啡店在500米外，打印店在300米外，客户还在催消息：",
+                options: [
+                    { text: "优先对接客户回消息，同时让同事帮忙买咖啡，自己去打印文件", scores: { 策略: 2 } },
+                    { text: "跟老板说明情况，申请延长5分钟，按紧急程度排序完成", scores: { 向上: 2 } },
+                    { text: "自己负责打印文件和对接客户，让外卖员帮忙买咖啡，节省时间", scores: { 责任: 2 } },
+                    { text: "分工给同事，自己对接客户，高效完成", scores: { 人际: 1, 执行: 1 } }
+                ]
+            },
+            {
+                title: "老板临时交给你一项从未接触过的任务——给公司新品写宣传文案，要求1小时内完成，你完全不懂文案写作，身边也没有懂行的同事：",
+                options: [
+                    { text: "坦诚自己不会做，主动推荐有经验的同事接手", scores: { 表达: 2 } },
+                    { text: "先答应下来，私下快速找同事请教技巧，再尝试完成", scores: { 投入: 1, 人际: 1 } },
+                    { text: "找借口说自己手头有紧急工作，无法接手", scores: { 策略: 2 } },
+                    { text: "硬着头皮接手，全程按照自己的理解完成，不推诿", scores: { 执行: 2 } }
+                ]
+            },
+            {
+                title: "如果只能选一个方向提升自己，避免在职场吃亏，你更倾向：",
+                options: [
+                    { text: "练判断力，看透套路不踩坑", scores: { 策略: 2 } },
+                    { text: "练人脉力，左右逢源有人帮", scores: { 人际: 2 } },
+                    { text: "练表达力，能说会道不被埋没", scores: { 表达: 2 } },
+                    { text: "练向上力，精准get领导需求", scores: { 向上: 2 } }
+                ]
+            }
+        ];
 
-function calculate(){
-if(answers.length < questions.length || answers.includes(undefined)){
-alert("还有题没有做出选择哦！30道题可比你的KPI容易多了吧～");
-return;
-}
+        // 3. 16种人格信息（含图片路径、描述、最怕的同事，图片名对应英文名小写）
+        const personalities = [
+            {
+                name: "汇报大师",
+                englishName: "pptmaster", // 图片名：pptmaster.png
+                title: "汇报大师｜PPT Master",
+                desc: `你是那种可以把“还没开始做”的项目，讲得像“已经复盘三轮”的人。
+工作进度不一定快，但表达进度永远领先一步。你深知一个职场真理：不会说的人在做牛马，会说的人在做汇报。
+有时候你也会恍惚——这活到底是我干的，还是我讲出来的？`,
+                fear: "你最怕的同事是：职场八爪鱼（Octopus）（他真干活，还能干很多活）"
+            },
+            {
+                name: "会议NPC",
+                englishName: "meetingnpc", // 图片名：meetingnpc.png
+                title: "会议NPC｜Meeting NPC",
+                desc: `你的日程表永远是满的：上午对齐，下午同步，晚上复盘。
+你不一定推进了事情，但你参与了所有过程。
+你最大的能力是——在每一场会议里，都像一个不可或缺但又无关紧要的存在。`,
+                fear: "你最怕的同事是：空头卷王（Busy bee）（会议思想永远落实不到位）"
+            },
+            {
+                name: "苦命马喽",
+                englishName: "malou", // 图片名：malou.png
+                title: "苦命马喽｜Malou",
+                desc: `你是团队里最踏实的那一个，活基本都在你这儿闭环。
+需求改三版你改，方案推不动你背，项目出问题你兜底。
+你不爱说，但你都做了。
+只不过有时候你也会怀疑：我这么努力，是不是只是让别人更好汇报？`,
+                fear: "你最怕的同事是：汇报大师（PPT Master）（活全是你的，功劳全是他的）"
+            },
+            {
+                name: "向上管理王",
+                englishName: "bossplayer", // 图片名：bossplayer.png
+                title: "向上管理王｜Boss Player",
+                desc: `你可能不是最会做事的，但一定是最懂老板的人。
+你知道什么时候汇报、怎么汇报、汇报什么能让老板满意。
+你做的不是工作，是老板体验优化工程。`,
+                fear: "你最怕的同事是：汇报大师（PPT Master）（他讲得比你更好听）"
+            },
+            {
+                name: "甩锅艺术家",
+                englishName: "blameshifter", // 图片名：blameshifter.png
+                title: "甩锅艺术家｜Blame Shifter",
+                desc: `你对流程的理解只有一条：功劳共享，责任单飞。
+你不一定最强，但你一定是活得最轻松的那一类。`,
+                fear: "最怕遇到：职场老油条（Smooth Operator）（你想甩，他比你更懂怎么“合法归因”。）"
+            },
+            {
+                name: "加班演员",
+                englishName: "actor", // 图片名：actor.png
+                title: "加班演员｜Actor",
+                desc: `你白天在恢复体力，晚上在证明努力。
+白天安静如鸡，晚上灯火通明。
+你不是不干活，你只是习惯把努力展示在老板看得到的时间段。`,
+                fear: "你最怕的同事是：KPI信徒（KPI Believer）（他用结果直接碾压表演）"
+            },
+            {
+                name: "KPI信徒",
+                englishName: "kpibeliever", // 图片名：kpibeliever.png
+                title: "KPI信徒｜KPI Believer",
+                desc: `你不一定相信过程，但你绝对相信指标。
+只要KPI完成，方法不重要、路径不重要、甚至客户开不开心也不重要。
+你的世界很简单：数据对，一切都对。`,
+                fear: "你最怕的同事是：摸鱼哲学家（Slacker）（他啥也没做，还活得很开心）"
+            },
+            {
+                name: "需求黑洞",
+                englishName: "blackhole", // 图片名：blackhole.png
+                title: "需求黑洞｜Black Hole",
+                desc: `所有需求到了你这里，都进入了另一个维度。
+不是你不做，是需求太多、优先级太复杂、流程太长。
+久而久之，大家已经默认：提需求=放生需求。`,
+                fear: "你最怕的同事是：苦命马喽（Malou）（他真的会把需求做出来）"
+            },
+            {
+                name: "佛系牛马",
+                englishName: "namoworkhorse", // 图片名：namoworkhorse.png
+                title: "佛系牛马｜Namo Workhorse",
+                desc: `你不争不抢，不卷不闹。
+需求来了说“行吧”，加班来了说“可以”，调整来了说“没事”。
+你不是没有情绪，你只是把情绪修行成了：算了。`,
+                fear: "你最怕的同事是：向上管理王（Boss Player）（他一动，你就被安排）"
+            },
+            {
+                name: "职场老油条",
+                englishName: "smoothoperator", // 图片名：smoothoperator.png
+                title: "职场老油条｜Smooth Operator",
+                desc: `你什么都懂，但你什么都不多做。
+你知道边界在哪，知道什么时候该发力，什么时候该隐身。
+别人拼命工作，你在研究：怎么不吃亏地工作。`,
+                fear: "你最怕的同事是：向上管理王（Boss Player）（你还在算账，他已经在定规则了）"
+            },
+            {
+                name: "背锅预备役",
+                englishName: "dayuanzhong", // 图片名：dayuanzhong.png
+                title: "背锅预备役｜Da Yuanzhong",
+                desc: `你总是那个“先试试”的人。
+项目出问题，你最先被想到；任务没人接，你最先被点名。
+你不是能力差，而是太好说话。
+久而久之，你就变成了团队的默认安全垫。`,
+                fear: "你最怕的同事是：甩锅艺术家（Blame Shifter）（你们俩一组合，剧情就定了）"
+            },
+            {
+                name: "空头卷王",
+                englishName: "busybee", // 图片名：busybee.png
+                title: "空头卷王｜Busy Bee",
+                desc: `你一直很忙，忙得很真实。
+但有时候你也说不清，到底忙出了什么结果。
+你很努力，但你的努力像空头支票一样无法兑现。
+你属于那种：主观上在卷，客观上在原地打转。`,
+                fear: "你最怕的同事是：摸鱼哲学家（Slacker）（为什么他能心安理得的躺平！）"
+            },
+            {
+                name: "摸鱼哲学家",
+                englishName: "slacker", // 图片名：slacker.png
+                title: "摸鱼哲学家｜Slacker",
+                desc: `你早就想明白了：工作只是生活的一部分。
+你不反对努力，但更相信“适度摆烂”。
+你不是不干活，你只是精准地避开不必要的消耗。
+你的人生信条是：不内耗、不硬扛，清醒摸鱼，快乐万岁。`,
+                fear: "你最怕的同事是：KPI信徒（KPI Believer）（不信奉KPI的人都该被烧死！）"
+            },
+            {
+                name: "办公室氛围组",
+                englishName: "vibemaker", // 图片名：vibemaker.png
+                title: "办公室氛围组｜Vibe Maker",
+                desc: `你可能不是最能干的，但一定是最不能缺的。
+有你在，群里不冷场，会议不尴尬，加班也不那么难受。
+你输出的不是业绩，是情绪价值。`,
+                fear: "你最怕的同事是：职场透明人（Who Guy）（带不动，真的带不动）"
+            },
+            {
+                name: "职场八爪鱼",
+                englishName: "octopus", // 图片名：octopus.png
+                title: "职场八爪鱼｜Octopus",
+                desc: `你一个人干着三个人的活，对接四个部门，还能顺手救个火。
+你什么都会一点，也什么都在做。
+别人是岗位，你是系统组件。
+只不过有时候你也会想：我这么全能，是不是因为没人分担？`,
+                fear: "你最怕的同事是：需求黑洞（Black Hole）（你再能干也填不满）"
+            },
+            {
+                name: "职场透明人",
+                englishName: "whoguy", // 图片名：whoguy.png
+                title: "职场透明人｜Who Guy",
+                desc: `你一直都在，但好像又不在。
+开会不点你，汇报不提你，连吐槽都轮不到你。
+你在别人嘴里的名字永远是：“那个谁”。
+你没有犯错，但你也很难被记住。`,
+                fear: "你最怕的同事是：办公室氛围组（Vibe Maker）（勿cue，只是想来上个淡班）"
+            }
+        ];
 
-locked = true;
-document.getElementById('submitBtn').disabled = true;
+        // 4. 页面元素获取
+        const guideContainer = document.getElementById('guideContainer');
+        const testContainer = document.getElementById('testContainer');
+        const resultContainer = document.getElementById('resultContainer');
+        const startBtn = document.getElementById('startBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        const restartBtn = document.getElementById('restartBtn');
+        const finishedCountEl = document.getElementById('finishedCount');
+        const personalityImg = document.getElementById('personalityImg');
+        const personalityTitle = document.getElementById('personalityTitle');
+        const personalityDesc = document.getElementById('personalityDesc');
 
-let total={exec:0,expr:0,up:0,strat:0};
-answers.forEach(a=>{for(let k in a){total[k]+=a[k];}});
+        // 5. 初始化测试题
+        let selectedOptions = new Array(questions.length).fill(null); // 存储选中的选项索引
+        let finishedCount = 0;
 
-// 🔥 16人格（完整）
-const personalities=[
-{name:"汇报大师",main:"expr",sub:"up",img:"images/huibao.jpg",desc:"你开口就是重点，三句话讲清一个项目，是老板最爱听的人。",tags:["表达王","懂汇报"]},
-{name:"会议狂人",main:"up",sub:"expr",img:"images/meeting.jpg",desc:"一天开三场会，你比谁都忙，但产出主要在会议纪要里。",tags:["开会","协调"]},
-{name:"苦命马喽",main:"exec",sub:"strat",img:"images/malou.jpg",desc:"活都是你干，功劳别人拿，你是职场最稳定的工具人。",tags:["执行","抗压"]},
-{name:"甩锅艺术家",main:"strat",sub:"expr",img:"images/throw.jpg",desc:"功劳可以共享，责任必须单飞，你从不背锅。",tags:["甩锅","自保"]},
-{name:"向上管理王",main:"up",sub:"strat",img:"images/up.jpg",desc:"你比老板更懂老板，提前规避一切风险。",tags:["向上","预判"]},
-{name:"演员型打工人",main:"expr",sub:"strat",img:"images/actor.jpg",desc:"状态不一定在线，但表演必须在线。",tags:["演技","职场感"]},
-{name:"执行机器",main:"exec",sub:"exec",img:"images/exec.jpg",desc:"你只认结果，干就完了，是最纯粹的执行派。",tags:["效率","行动"]},
-{name:"摸鱼哲学家",main:"strat",sub:"up",img:"images/fish.jpg",desc:"你研究的是如何优雅地不干活。",tags:["摸鱼","生存"]},
-{name:"老黄牛",main:"exec",sub:"exec",img:"images/cow.jpg",desc:"踏实干活，从不抱怨，但也容易被忽视。",tags:["踏实","稳定"]},
-{name:"流量型选手",main:"expr",sub:"exec",img:"images/traffic.jpg",desc:"你做的东西不一定多，但一定被看到。",tags:["曝光","表达"]},
-{name:"透明人",main:"strat",sub:"exec",img:"images/ghost.jpg",desc:"你一直都在，但没人注意到你。",tags:["隐身","低存在"]},
-{name:"资源整合者",main:"up",sub:"expr",img:"images/resource.jpg",desc:"你不干活，但能让事情发生。",tags:["连接","资源"]},
-{name:"节奏掌控者",main:"strat",sub:"up",img:"images/control.jpg",desc:"你掌控节奏，让别人跟着你走。",tags:["节奏","掌控"]},
-{name:"气氛组",main:"expr",sub:"people",img:"images/party.jpg",desc:"人在工位，气氛到位。",tags:["氛围","社交"]},
-{name:"低调搞钱王",main:"exec",sub:"strat",img:"images/money.jpg",desc:"不声不响，但钱是真的到账。",tags:["结果","赚钱"]},
-{name:"全局操盘手",main:"up",sub:"strat",img:"images/boss.jpg",desc:"你不下场，但局一直在你手里。",tags:["操盘","格局"]}
-];
+        // 渲染测试题
+        function renderQuestions() {
+            testContainer.innerHTML = '';
+            questions.forEach((q, index) => {
+                const questionEl = document.createElement('div');
+                questionEl.className = 'question';
+                questionEl.innerHTML = `
+                    ${index + 1}. ${q.title}
+                        ${q.options.map((opt, optIndex) => `
+                            
+                                ${String.fromCharCode(65 + optIndex)}. ${opt.text}
+                            
+                        `).join('')}
+                    
+                `;
+                testContainer.appendChild(questionEl);
+            });
 
-let best=null,max=0;
-personalities.forEach(p=>{
-let score= total[p.main]*0.6 + total[p.sub]*0.4;
-if(score>max){max=score;best=p;}
-});
+            // 添加选项点击事件
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.addEventListener('click', function() {
+                    const questionIndex = parseInt(this.getAttribute('data-index'));
+                    const optIndex = parseInt(this.getAttribute('data-opt-index'));
+                    // 取消当前问题的其他选项选中状态
+                    document.querySelectorAll(`.question:nth-child(${questionIndex + 1}) .option`).forEach(o => {
+                        o.classList.remove('selected');
+                    });
+                    // 选中当前选项
+                    this.classList.add('selected');
+                    // 更新选中状态
+                    if (selectedOptions[questionIndex] === null) {
+                        finishedCount++;
+                    }
+                    selectedOptions[questionIndex] = optIndex;
+                    // 更新已完成题目数
+                    finishedCountEl.textContent = finishedCount;
+                });
+            });
 
-let percent = Math.min(100,Math.round(max));
+            // 添加按钮组
+            const btnGroup = document.createElement('div');
+            btnGroup.className = 'btn-group';
+            btnGroup.innerHTML = `
+                
+            `;
+            testContainer.appendChild(btnGroup);
 
-document.getElementById('result').innerHTML=`
-<img src="${best.img}" />
-<div class="title">你的职场人格：${best.name}</div>
-<div class="sub">匹配度 ${percent}%</div>
-<p>${best.desc}</p>
-<div>${best.tags.map(t=>`<span class='tag'>${t}</span>`).join('')}</div>
-<hr>
-<p>👉 转发给朋友看看他们是哪一类。</p>
-`;
-}
+            // 重新绑定按钮事件
+            document.getElementById('resetBtn').addEventListener('click', resetTest);
+            document.getElementById('submitBtn').addEventListener('click', submitTest);
 
-render();
-</script>
-</body>
-</html>
+            // 添加已完成提示
+            const scoreHint = document.createElement('p');
+            scoreHint.className = 'score-hint';
+            scoreHint.innerHTML = `已完成：${finishedCount}/30 题`;
+            testContainer.appendChild(scoreHint);
+        }
+
+        // 6. 重置测试
+        function resetTest() {
+            selectedOptions = new Array(questions.length).fill(null);
+            finishedCount = 0;
+            renderQuestions();
+            finishedCountEl.textContent = finishedCount;
+        }
+
+        // 7. 提交测试，计算得分并匹配人格
+        function submitTest() {
+            // 检查是否完成所有题目
+            if (finishedCount < 30) {
+                alert(`请完成所有30道题目后再提交（当前已完成${finishedCount}题）`);
+                return;
+            }
+
+            // 重置得分
+            for (let key in scores) {
+                scores[key] = 0;
+            }
+
+            // 计算各维度得分
+            questions.forEach((q, index) => {
+                const optIndex = selectedOptions[index];
+                const selectedOpt = q.options[optIndex];
+                for (let key in selectedOpt.scores) {
+                    scores[key] += selectedOpt.scores[key];
+                    // 确保得分不低于0
+                    if (scores[key] < 0) scores[key] = 0;
+                }
+            });
+
+            // 匹配人格（按优化后规则，无硬性达标要求，取匹配度最高者）
+            let maxMatchRate = 0;
+            let matchedPersonality = personalities[8]; // 默认佛系牛马
+
+            // 逐个计算人格匹配度
+            personalities.forEach(personality => {
+                let matchRate = 0;
+                switch (personality.name) {
+                    case "汇报大师":
+                        // 核心维度（表达+向上），取两项最高得分之和 ÷ 72
+                        const expUpSum = scores.表达 + scores.向上;
+                        matchRate = (expUpSum / 72) * 100;
+                        break;
+                    case "会议NPC":
+                        // 核心维度（策略+表达），取两项最高得分之和 ÷ 72
+                        const strExpSum = scores.策略 + scores.表达;
+                        matchRate = (strExpSum / 72) * 100;
+                        break;
+                    case "苦命马喽":
+                        // 核心维度（执行+投入），取两项最高得分之和 ÷ 72
+                        const exeInpSum = scores.执行 + scores.投入;
+                        matchRate = (exeInpSum / 72) * 100;
+                        break;
+                    case "向上管理王":
+                        // 核心维度（向上+表达），优先参考向上，取两项之和 ÷ 72
+                        const upExpSum = scores.向上 + scores.表达;
+                        matchRate = (upExpSum / 72) * 100;
+                        break;
+                    case "甩锅艺术家":
+                        // 核心维度（策略）+ 辅助（责任），之和 ÷ 70
+                        const strResSum = scores.策略 + scores.责任;
+                        matchRate = (strResSum / 70) * 100;
+                        break;
+                    case "加班演员":
+                        // 核心维度（表达+投入），取两项之和 ÷ 72
+                        const expInpSum = scores.表达 + scores.投入;
+                        matchRate = (expInpSum / 72) * 100;
+                        break;
+                    case "KPI信徒":
+                        // 核心维度（执行+策略），取两项之和 ÷ 72
+                        const exeStrSum = scores.执行 + scores.策略;
+                        matchRate = (exeStrSum / 72) * 100;
+                        break;
+                    case "需求黑洞":
+                        // 核心维度（策略+责任），取两项之和 ÷ 70
+                        const strResSum2 = scores.策略 + scores.责任;
+                        matchRate = (strResSum2 / 70) * 100;
+                        break;
+                    case "佛系牛马":
+                        // 仅当所有人格匹配度均＜60%时判定，此处先计算
+                        const inpStrSum = scores.投入 + scores.策略;
+                        matchRate = (inpStrSum / 72) * 100;
+                        break;
+                    case "职场老油条":
+                        // 核心维度（策略+责任），优先参考策略，取两项之和 ÷ 70
+                        const strResSum3 = scores.策略 + scores.责任;
+                        matchRate = (strResSum3 / 70) * 100;
+                        break;
+                    case "背锅预备役":
+                        // 核心维度（责任+投入），取两项之和 ÷ 70
+                        const resInpSum = scores.责任 + scores.投入;
+                        matchRate = (resInpSum / 70) * 100;
+                        break;
+                    case "空头卷王":
+                        // 核心维度（投入+执行+策略），取最高两项，策略×0.5，之和 ÷ 72
+                        const topTwo = [scores.投入, scores.执行, scores.策略].sort((a,b) => b - a).slice(0,2);
+                        let busySum = 0;
+                        if (topTwo.includes(scores.策略) && topTwo.length === 2) {
+                            busySum = topTwo[0] + (topTwo[1] === scores.策略 ? topTwo[1] * 0.5 : topTwo[1]);
+                        } else {
+                            busySum = topTwo[0] + topTwo[1];
+                        }
+                        matchRate = (busySum / 72) * 100;
+                        break;
+                    case "摸鱼哲学家":
+                        // 核心维度（策略+投入），取两项之和 ÷ 72
+                        const strInpSum = scores.策略 + scores.投入;
+                        matchRate = (strInpSum / 72) * 100;
+                        break;
+                    case "办公室氛围组":
+                        // 核心维度（人际+表达），取两项之和 ÷ 72
+                        const intExpSum = scores.人际 + scores.表达;
+                        matchRate = (intExpSum / 72) * 100;
+                        break;
+                    case "职场八爪鱼":
+                        // 核心维度（执行+人际），取两项之和 ÷ 72
+                        const exeIntSum = scores.执行 + scores.人际;
+                        matchRate = (exeIntSum / 72) * 100;
+                        break;
+                    case "职场透明人":
+                        // 核心维度（人际+策略），取两项之和 ÷ 72
+                        const intStrSum = scores.人际 + scores.策略;
+                        matchRate = (intStrSum / 72) * 100;
+                        break;
+                }
+
+                // 保留两位小数
+                matchRate = Math.round(matchRate * 10) / 10;
+
+                // 更新最高匹配度和对应人格
+                if (matchRate > maxMatchRate) {
+                    maxMatchRate = matchRate;
+                    matchedPersonality = personality;
+                }
+            });
+
+            // 检查是否所有人格匹配度都＜60%，若是则判定为佛系牛马
+            const allMatchRates = personalities.map(p => {
+                let rate = 0;
+                // 重复上述匹配度计算逻辑（简化版）
+                switch (p.name) {
+                    case "汇报大师": rate = ((scores.表达 + scores.向上)/72)*100; break;
+                    case "会议NPC": rate = ((scores.策略 + scores.表达)/72)*100; break;
+                    case "苦命马喽": rate = ((scores.执行 + scores.投入)/72)*100; break;
+                    case "向上管理王": rate = ((scores.向上 + scores.表达)/72)*100; break;
+                    case "甩锅艺术家": rate = ((scores.策略 + scores.责任)/70)*100; break;
+                    case "加班演员": rate = ((scores.表达 + scores.投入)/72)*100; break;
+                    case "KPI信徒": rate = ((scores.执行 + scores.策略)/72)*100; break;
+                    case "需求黑洞": rate = ((scores.策略 + scores.责任)/70)*100; break;
+                    case "佛系牛马": rate = ((scores.投入 + scores.策略)/72)*100; break;
+                    case "职场老油条": rate = ((scores.策略 +
